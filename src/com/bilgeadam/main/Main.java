@@ -10,7 +10,10 @@ import org.hibernate.Session;
 
 import com.bilgeadam.controller.AdminController;
 import com.bilgeadam.controller.ArtistController;
+import com.bilgeadam.controller.CDController;
+import com.bilgeadam.controller.DVDController;
 import com.bilgeadam.controller.UserController;
+import com.bilgeadam.controller.VinylController;
 import com.bilgeadam.entity.Admin;
 import com.bilgeadam.entity.Artist;
 import com.bilgeadam.entity.CD;
@@ -374,10 +377,16 @@ public class Main {
 		TypedQuery<Admin> typedQuery = session.createQuery(hql, Admin.class);
 		typedQuery.setParameter("mail", mail);
 		typedQuery.setParameter("password", password);
-		Admin admin;
+		
 		try {
-			admin = typedQuery.getSingleResult();
+			
+			session.close();
+			if (session.isOpen()) {
+				System.out.println("Session hala açık");
+			}
 			System.out.println("Başarılı");
+			
+			menuAdmin();
 			
 		} catch (Exception e) {
 			System.out.println("Kullanıcı bulunamadı");
@@ -386,6 +395,194 @@ public class Main {
 			
 		}
 		
+	}
+	
+	private void menuAdmin() {
+		while (true) {
+			System.out.println("Ürün eklemek için 1 e basın");
+			System.out.println("Ürün silmek için 2 e basın");
+			System.out.println("Ürün güncellemek için 3 e basın");
+			int select = scan.nextInt();
+			if (select == 1) {
+				System.out.println("Hangi tip ürün girişi istiyorsununz");
+				String selection = scan.next();
+				if (selection.equalsIgnoreCase("cd")) {
+					addCD();
+					
+				} else if (selection.equalsIgnoreCase("vinyl")) {
+					addVinyl();
+					
+				} else if (selection.equalsIgnoreCase("dvd")) {
+					addDVD();
+				}
+				
+			}
+			if (select == 2) {
+				TreeMap<String, Product> productList = productLists();
+				System.out.println("Silinecek Albümün ismini girin");
+				String name = scan.next();
+				Product pro = productList.get(name);
+				if (pro instanceof CD) {
+					CD cd = (CD) pro;
+					CDController cdController = new CDController();
+					cdController.delete(cd);
+				}
+				if (pro instanceof Vinyl) {
+					Vinyl vinyl = (Vinyl) pro;
+					VinylController vinylController = new VinylController();
+					vinylController.delete(vinyl);
+				}
+				if (pro instanceof DVD) {
+					DVD dvd = (DVD) pro;
+					DVDController dvdController = new DVDController();
+					dvdController.delete(dvd);
+				}
+				
+			}
+			if (select == 3) {
+				
+			}
+			
+			System.out.println("devam etmek istiyormusunuz");
+			String selection = scan.next();
+			if (selection.equalsIgnoreCase("H")) {
+				
+				break;
+			}
+		}
+		
+	}
+	
+	private TreeMap<String, Product> productLists() {
+		Session session = HibernateUtil.getSessionfactory().openSession();
+		String hql = "select stu from Vinyl as stu";
+		TypedQuery<Vinyl> typedQuery = session.createQuery(hql, Vinyl.class);
+		ArrayList<Vinyl> vinyl = (ArrayList<Vinyl>) typedQuery.getResultList();
+		String hql1 = "select stu from CD as stu";
+		TypedQuery<CD> typedQuery1 = session.createQuery(hql1, CD.class);
+		ArrayList<CD> cd = (ArrayList<CD>) typedQuery1.getResultList();
+		String hql2 = "select stu from DVD as stu ";
+		TypedQuery<DVD> typedQuery2 = session.createQuery(hql2, DVD.class);
+		ArrayList<DVD> dvd = (ArrayList<DVD>) typedQuery2.getResultList();
+		
+		TreeMap<String, Product> productList = new TreeMap<>();
+		for (Vinyl temp : vinyl) {
+			
+			productList.put(temp.getAlbumName(), temp);
+		}
+		for (DVD temp : dvd) {
+			
+			productList.put(temp.getAlbumName(), temp);
+		}
+		for (CD temp : cd) {
+			
+			productList.put(temp.getAlbumName(), temp);
+		}
+		
+		return productList;
+	}
+	
+	private void addDVD() {
+		EType albumType = null;
+		System.out.println("Albüm Adı Girin");
+		String albumName = scan.next();
+		System.out.println("Artist Adı girin");
+		String artistName = scan.next();
+		System.out.println("Artist Soyadı girin");
+		String artistSurname = scan.next();
+		System.out.println("Artist bilgisi girin");
+		String artistInfo = scan.next();
+		System.out.println("Albüm türü Girin(Pop,Rock,Rap)");
+		String type = scan.next();
+		if (type.equalsIgnoreCase("pop")) {
+			albumType = EType.Pop;
+		} else if (type.equalsIgnoreCase("rap")) {
+			albumType = EType.Rap;
+		} else if (type.equalsIgnoreCase("rock")) {
+			albumType = EType.Rock;
+		}
+		System.out.println("Albüm fiyat Girin");
+		int price = scan.nextInt();
+		System.out.println("Albüm indirim oranı Girin");
+		int discountRate = scan.nextInt();
+		System.out.println("Albüm stok sayısı  Girin");
+		int stock = scan.nextInt();
+		System.out.println("Kalite Girin");
+		int quality = scan.nextInt();
+		
+		Artist artist = new Artist(artistName, artistSurname, artistInfo);
+		DVD dvd = new DVD(albumName, artist, albumType, price, discountRate, stock, quality);
+		artist.getAlbums().add(dvd);
+		ArtistController artistController = new ArtistController();
+		artistController.create(artist);
+	}
+	
+	private void addVinyl() {
+		EType albumType = null;
+		System.out.println("Albüm Adı Girin");
+		String albumName = scan.next();
+		System.out.println("Artist Adı girin");
+		String artistName = scan.next();
+		System.out.println("Artist Soyadı girin");
+		String artistSurname = scan.next();
+		System.out.println("Artist bilgisi girin");
+		String artistInfo = scan.next();
+		System.out.println("Albüm türü Girin(Pop,Rock,Rap)");
+		String type = scan.next();
+		if (type.equalsIgnoreCase("pop")) {
+			albumType = EType.Pop;
+		} else if (type.equalsIgnoreCase("rap")) {
+			albumType = EType.Rap;
+		} else if (type.equalsIgnoreCase("rock")) {
+			albumType = EType.Rock;
+		}
+		System.out.println("Albüm fiyat Girin");
+		int price = scan.nextInt();
+		System.out.println("Albüm indirim oranı Girin");
+		int discountRate = scan.nextInt();
+		System.out.println("Albüm stok sayısı  Girin");
+		int stock = scan.nextInt();
+		System.out.println("Plak dönüş hızı  Girin(33-45)");
+		int rpm = scan.nextInt();
+		System.out.println("Plak çapı  Girin(7-12)");
+		int diameter = scan.nextInt();
+		Artist artist = new Artist(artistName, artistSurname, artistInfo);
+		Vinyl vinyl = new Vinyl(albumName, artist, albumType, price, discountRate, stock, rpm, diameter);
+		artist.getAlbums().add(vinyl);
+		ArtistController artistController = new ArtistController();
+		artistController.create(artist);
+	}
+	
+	private void addCD() {
+		EType albumType = null;
+		System.out.println("Albüm Adı Girin");
+		String albumName = scan.next();
+		System.out.println("Artist Adı girin");
+		String artistName = scan.next();
+		System.out.println("Artist Soyadı girin");
+		String artistSurname = scan.next();
+		System.out.println("Artist bilgisi girin");
+		String artistInfo = scan.next();
+		System.out.println("Albüm türü Girin(Pop,Rock,Rap)");
+		String type = scan.next();
+		if (type.equalsIgnoreCase("pop")) {
+			albumType = EType.Pop;
+		} else if (type.equalsIgnoreCase("rap")) {
+			albumType = EType.Rap;
+		} else if (type.equalsIgnoreCase("rock")) {
+			albumType = EType.Rock;
+		}
+		System.out.println("Albüm fiyat Girin");
+		int price = scan.nextInt();
+		System.out.println("Albüm indirim oranı Girin");
+		int discountRate = scan.nextInt();
+		System.out.println("Albüm stok sayısı Girin");
+		int stock = scan.nextInt();
+		Artist artist = new Artist(artistName, artistSurname, artistInfo);
+		CD cd = new CD(albumName, artist, albumType, price, discountRate, stock);
+		artist.getAlbums().add(cd);
+		ArtistController artistController = new ArtistController();
+		artistController.create(artist);
 	}
 	
 	private static void createDatabase() {

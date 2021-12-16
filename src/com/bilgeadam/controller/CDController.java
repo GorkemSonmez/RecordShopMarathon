@@ -35,6 +35,8 @@ public class CDController implements IDatabaseCrud<CD> {
 				session.getTransaction().begin();
 				session.remove(findEntity);
 				session.getTransaction().commit();
+				session.close();
+				
 				System.out.println("silme tamamdır");
 			}
 		} catch (Exception e) {
@@ -60,6 +62,7 @@ public class CDController implements IDatabaseCrud<CD> {
 				session.getTransaction().begin();
 				session.merge(findEntity);
 				session.getTransaction().commit();
+				session.close();
 				System.out.println("güncelleme tamamdır");
 			}
 			
@@ -96,6 +99,7 @@ public class CDController implements IDatabaseCrud<CD> {
 			
 			if (CDEntity != null) {
 				System.out.println("bulundu... " + CDEntity);
+				session.close();
 				return CDEntity;
 			} else {
 				System.out.println("Aradığınız kriterde sonuçlar bulunamadı ...");

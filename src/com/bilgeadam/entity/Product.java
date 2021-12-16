@@ -20,7 +20,7 @@ public abstract class Product {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", nullable = false)
-	protected int Id;
+	protected long Id;
 	@Column(name = "album_name")
 	protected String albumName;
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
@@ -51,11 +51,11 @@ public abstract class Product {
 		this.stock = stock;
 	}
 	
-	public int getId() {
+	public long getId() {
 		return Id;
 	}
 	
-	public void setId(int id) {
+	public void setId(long id) {
 		Id = id;
 	}
 	

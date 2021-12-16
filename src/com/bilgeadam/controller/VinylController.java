@@ -35,6 +35,7 @@ public class VinylController implements IDatabaseCrud<Vinyl> {
 				session.getTransaction().begin();
 				session.remove(findEntity);
 				session.getTransaction().commit();
+				session.close();
 				System.out.println("silme tamamdır");
 			}
 		} catch (Exception e) {
@@ -62,6 +63,7 @@ public class VinylController implements IDatabaseCrud<Vinyl> {
 				session.getTransaction().begin();
 				session.merge(findEntity);
 				session.getTransaction().commit();
+				session.close();
 				System.out.println("güncelleme tamamdır");
 			}
 			
@@ -98,6 +100,7 @@ public class VinylController implements IDatabaseCrud<Vinyl> {
 			
 			if (vinylEntity != null) {
 				System.out.println("bulundu... " + vinylEntity);
+				session.close();
 				return vinylEntity;
 			} else {
 				System.out.println("Aradığınız kriterde sonuçlar bulunamadı ...");

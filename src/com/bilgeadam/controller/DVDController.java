@@ -29,12 +29,15 @@ public class DVDController implements IDatabaseCrud<DVD> {
 	@Override
 	public void delete(DVD entity) {
 		try {
-			DVD findEntity = find(entity.getId());
+			long entityId = entity.getId() + 0L;
+			System.out.println(entityId);
+			DVD findEntity = find(entityId);
 			if (findEntity != null) {
 				Session session = databaseConnectionHibernate();
 				session.getTransaction().begin();
 				session.remove(findEntity);
 				session.getTransaction().commit();
+				session.close();
 				System.out.println("silme tamamdır");
 			}
 		} catch (Exception e) {
@@ -46,8 +49,9 @@ public class DVDController implements IDatabaseCrud<DVD> {
 	
 	@Override
 	public void update(DVD entity) {
+		long entityId = entity.getId();
 		try {
-			DVD findEntity = find(entity.getId());
+			DVD findEntity = find(entityId);
 			if (findEntity != null) {
 				findEntity.setAlbumName(entity.getAlbumName());
 				findEntity.setArtist(entity.getArtist());
@@ -61,6 +65,7 @@ public class DVDController implements IDatabaseCrud<DVD> {
 				session.getTransaction().begin();
 				session.merge(findEntity);
 				session.getTransaction().commit();
+				session.close();
 				System.out.println("güncelleme tamamdır");
 			}
 			
@@ -97,6 +102,7 @@ public class DVDController implements IDatabaseCrud<DVD> {
 			
 			if (DVDEntity != null) {
 				System.out.println("bulundu... " + DVDEntity);
+				session.close();
 				return DVDEntity;
 			} else {
 				System.out.println("Aradığınız kriterde sonuçlar bulunamadı ...");
